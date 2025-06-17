@@ -1,16 +1,18 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("maven-publish")
 }
 
 android {
-    namespace = "com.github.deianvn.compose.director"
+    namespace = "com.github.deianvn.compose.director.example"
     compileSdk = 35
 
     defaultConfig {
-        minSdk = 23
-        lint.targetSdk = 35
+        applicationId = "com.github.deianvn.compose.director.example"
+        minSdk = 24
+        targetSdk = 35
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,29 +35,11 @@ android {
     }
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("release") {
-                from(components["release"])
-                groupId = "com.github.deianvn"
-                artifactId = "compose-director"
-
-                // Change version for new release
-                version = "1.0.0"
-            }
-        }
-    }
-}
-
 dependencies {
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation(libs.timber)
-    implementation(libs.retrofit)
-    implementation(libs.androidx.runtime.android)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

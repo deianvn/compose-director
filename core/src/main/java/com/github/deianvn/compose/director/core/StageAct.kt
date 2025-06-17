@@ -1,58 +1,38 @@
-package com.github.deianvn.compose.director
+package com.github.deianvn.compose.director.core
 
 import com.github.deianvn.compose.director.error.SceneFault
 
 
-data class Scene<T, U : Plot>(
+data class StageAct<T : Scene, U : Plot>(
     val revision: Long = 0L,
-    val act: T,
+    val scene: T,
     val status: Status,
     val plot: U,
     val fault: SceneFault? = null,
-    val isChild: Boolean = false,
+    val isSequence: Boolean = true,
+    val decors: Set<Decor> = emptySet(),
     val action: () -> Unit = {}
-) {
+): Act {
 
-    private var previousScene: Scene<T, U>? = null
+    private var previousScene: StageAct<T, U>? = null
 
     fun next(
         status: Status = this.status,
-        act: T = this.act,
+        scene: T = this.scene,
         plot: U = this.plot,
         fault: SceneFault? = null,
+        isSequence: Boolean = true,
         action: () -> Unit = {}
-    ) = Scene(
+    ) = StageAct(
         revision = revision + 1L,
-        act = act,
+        scene = scene,
         status = status,
         plot = plot,
         fault = fault,
         action = action,
-        isChild = false,
+        isSequence = true,
     ).also {
-        it.previousScene = if (!isChild) {
-            this
-        } else {
-            previousScene
-        }
-    }
-
-    fun nextChild(
-        status: Status = this.status,
-        act: T = this.act,
-        plot: U = this.plot,
-        error: SceneFault? = null,
-        action: () -> Unit = {}
-    ) = Scene(
-        revision = revision + 1L,
-        act = act,
-        status = status,
-        plot = plot,
-        fault = fault,
-        isChild = true,
-        action = action
-    ).also {
-        it.previousScene = if (!isChild) {
+        it.previousScene = if (isSequence) {
             this
         } else {
             previousScene
@@ -60,28 +40,32 @@ data class Scene<T, U : Plot>(
     }
 
     fun hasPrevious(): Boolean {
-        return if (!isChild) {
+        return if (isSequence) {
             previousScene != null
         } else {
             previousScene?.previousScene != null
         }
     }
 
-    fun parentState(): Scene<T, U>? {
+    fun currentSequence(): StageAct<T, U>? {
         return when {
-            !isChild -> this
+            isSequence -> this
             else -> previousScene
         }
     }
 
-    fun pop(): Scene<T, U>? {
-        return parentState()?.previousScene
+    fun pop(): StageAct<T, U>? {
+        return currentSequence()?.previousScene
+    }
+
+    inline fun <reified V : Decor> getDecor(): V? {
+        return decors.firstOrNull { it is V } as? V
     }
 
     fun getDebugInfo(): String {
-        val currentScene: Scene<*, *>? = this
-        val chain = mutableListOf<Scene<*, *>>()
-        var ptr = currentScene
+        val currentStageAct: StageAct<*, *>? = this
+        val chain = mutableListOf<StageAct<*, *>>()
+        var ptr = currentStageAct
         while (ptr != null) {
             chain.add(ptr)
             ptr = ptr.previousScene
@@ -92,7 +76,7 @@ data class Scene<T, U : Plot>(
         result.append("[*")
 
         chain.forEach {
-            if (!it.isChild) {
+            if (it.isSequence) {
                 result.append("] --> [")
             } else {
                 result.append(" -> ")
@@ -100,7 +84,7 @@ data class Scene<T, U : Plot>(
             result.append(
                 String.format(
                     "%s@%s",
-                    it.act::class.simpleName,
+                    it.scene::class.simpleName,
                     it.fault?.javaClass?.simpleName ?: it.status
                 )
             )
