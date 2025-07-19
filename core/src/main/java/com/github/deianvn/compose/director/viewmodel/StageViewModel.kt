@@ -1,12 +1,10 @@
 package com.github.deianvn.compose.director.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.github.deianvn.compose.director.core.Act
+import com.github.deianvn.compose.director.core.Stage
 import com.github.deianvn.compose.director.core.Decor
 import com.github.deianvn.compose.director.core.Scene
 import com.github.deianvn.compose.director.core.Plot
-import com.github.deianvn.compose.director.core.Status
-import com.github.deianvn.compose.director.error.SceneFault
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
@@ -18,13 +16,13 @@ import kotlin.let
 import kotlin.reflect.KClass
 
 
-abstract class ActViewModel<T : Scene, U : Plot, V: Decor>(
-    private val initialAct: Act<T, U, V>
+abstract class StageViewModel<T : Scene, U : Plot, V: Decor>(
+    private val initialStage: Stage<T, U, V>
 ) : ViewModel() {
 
-    private val _act = MutableStateFlow<Act<T, U, V>>(initialAct)
+    private val _stage = MutableStateFlow<Stage<T, U, V>>(initialStage)
 
-    val act get() = _act.asStateFlow()
+    val act get() = _stage.asStateFlow()
 
     init {
         logStateDebugInfo()
@@ -49,7 +47,7 @@ abstract class ActViewModel<T : Scene, U : Plot, V: Decor>(
         target: KClass<out T>? = null,
         targetSet: Set<KClass<out T>>? = null,
         inclusive: Boolean = false,
-        computeState: (state: Act<T, U, V>) -> Act<T, U, V>
+        computeState: (state: Stage<T, U, V>) -> Stage<T, U, V>
     ) {
         val combinedTargetSet: Set<KClass<out T>> = buildSet {
             target?.let { add(it) }
@@ -70,7 +68,7 @@ abstract class ActViewModel<T : Scene, U : Plot, V: Decor>(
             }
         )
 
-        _act.value = newAct
+        _stage.value = newAct
         newAct.action()
         logStateDebugInfo()
     }
@@ -90,35 +88,10 @@ abstract class ActViewModel<T : Scene, U : Plot, V: Decor>(
             inclusive = inclusive
         )
 
-        _act.value = newAct
+        _stage.value = newAct
         newAct.action()
 
         logStateDebugInfo()
-    }
-
-    fun publishError(
-        fault: SceneFault,
-        isSequence: Boolean = false
-    ) {
-        publish {
-            it.next(status = Status.IDLE, fault = fault, isSequence = isSequence)
-        }
-    }
-
-    fun publishLoading(
-        isSequence: Boolean = false
-    ) {
-        publish {
-            it.next(status = Status.WORKING, isSequence = isSequence)
-        }
-    }
-
-    fun publishSuccess(
-        isSequence: Boolean = false
-    ) {
-        publish {
-            it.next(status = Status.IDLE, isSequence = isSequence)
-        }
     }
 
     fun hasPrevious(): Boolean {
@@ -127,7 +100,7 @@ abstract class ActViewModel<T : Scene, U : Plot, V: Decor>(
 
     private fun getPreviousActByReplace(
         targetSteps: Set<KClass<out T>>
-    ): Act<T, U, V> {
+    ): Stage<T, U, V> {
 
         val parentState = act.value.currentSequence()
 
@@ -137,13 +110,13 @@ abstract class ActViewModel<T : Scene, U : Plot, V: Decor>(
             else -> act.value
         }
 
-        return state ?: initialAct.copy(isFinal = true)
+        return state ?: initialStage.copy(isFinal = true)
     }
 
     private fun getPreviousActByPop(
         targetSteps: Set<KClass<out T>>,
         inclusive: Boolean = false
-    ): Act<T, U, V> {
+    ): Stage<T, U, V> {
         val result = if (targetSteps.isEmpty()) {
             act.value.pop()
         } else {
@@ -159,7 +132,7 @@ abstract class ActViewModel<T : Scene, U : Plot, V: Decor>(
             }
         }
 
-        return result ?: initialAct.copy(isFinal = true)
+        return result ?: initialStage.copy(isFinal = true)
     }
 
     private fun logStateDebugInfo() {

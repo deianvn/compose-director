@@ -3,7 +3,7 @@ package com.github.deianvn.compose.director.core
 import com.github.deianvn.compose.director.error.SceneFault
 
 
-data class Act<T : Scene, U : Plot, V : Decor>(
+data class Stage<T : Scene, U : Plot, V : Decor>(
     val revision: Long = 0L,
     val scene: T,
     val status: Status,
@@ -15,7 +15,7 @@ data class Act<T : Scene, U : Plot, V : Decor>(
     val action: () -> Unit = {}
 ) {
 
-    private var previousScene: Act<T, U, V>? = null
+    private var previousScene: Stage<T, U, V>? = null
 
     fun next(
         status: Status = this.status,
@@ -25,7 +25,7 @@ data class Act<T : Scene, U : Plot, V : Decor>(
         fault: SceneFault? = null,
         isSequence: Boolean = true,
         action: () -> Unit = {}
-    ) = Act(
+    ) = Stage(
         revision = revision + 1L,
         scene = scene,
         status = status,
@@ -50,21 +50,21 @@ data class Act<T : Scene, U : Plot, V : Decor>(
         }
     }
 
-    fun currentSequence(): Act<T, U, V>? {
+    fun currentSequence(): Stage<T, U, V>? {
         return when {
             isSequence -> this
             else -> previousScene
         }
     }
 
-    fun pop(): Act<T, U, V>? {
+    fun pop(): Stage<T, U, V>? {
         return currentSequence()?.previousScene
     }
 
     fun getDebugInfo(): String {
-        val currentAct: Act<*, *, *>? = this
-        val chain = mutableListOf<Act<*, *, *>>()
-        var ptr = currentAct
+        val currentStage: Stage<*, *, *>? = this
+        val chain = mutableListOf<Stage<*, *, *>>()
+        var ptr = currentStage
         while (ptr != null) {
             chain.add(ptr)
             ptr = ptr.previousScene
