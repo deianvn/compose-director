@@ -1,6 +1,6 @@
 package com.github.deianvn.compose.director.core
 
-import com.github.deianvn.compose.director.error.SceneFault
+import com.github.deianvn.compose.director.error.SceneError
 
 
 data class Stage<T : Scene, U : Plot, V : Decor>(
@@ -9,7 +9,7 @@ data class Stage<T : Scene, U : Plot, V : Decor>(
     val status: Status,
     val plot: U,
     val decor: V,
-    val fault: SceneFault? = null,
+    val fault: SceneError? = null,
     val isSequence: Boolean = true,
     val isFinal: Boolean = false,
     val action: () -> Unit = {}
@@ -22,7 +22,7 @@ data class Stage<T : Scene, U : Plot, V : Decor>(
         scene: T = this.scene,
         plot: U = this.plot,
         decor: V = this.decor,
-        fault: SceneFault? = null,
+        fault: SceneError? = null,
         isSequence: Boolean = true,
         action: () -> Unit = {}
     ) = Stage(

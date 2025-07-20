@@ -1,18 +1,13 @@
-package com.github.deianvn.compose.director.viewmodel
+package com.github.deianvn.compose.director.ui
 
 import androidx.lifecycle.ViewModel
-import com.github.deianvn.compose.director.core.Stage
 import com.github.deianvn.compose.director.core.Decor
-import com.github.deianvn.compose.director.core.Scene
 import com.github.deianvn.compose.director.core.Plot
+import com.github.deianvn.compose.director.core.Scene
+import com.github.deianvn.compose.director.core.Stage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
-import kotlin.collections.any
-import kotlin.collections.none
-import kotlin.jvm.Throws
-import kotlin.jvm.javaClass
-import kotlin.let
 import kotlin.reflect.KClass
 
 
@@ -22,7 +17,7 @@ abstract class StageViewModel<T : Scene, U : Plot, V: Decor>(
 
     private val _stage = MutableStateFlow<Stage<T, U, V>>(initialStage)
 
-    val act get() = _stage.asStateFlow()
+    val stage get() = _stage.asStateFlow()
 
     init {
         logStateDebugInfo()
@@ -30,13 +25,13 @@ abstract class StageViewModel<T : Scene, U : Plot, V: Decor>(
 
     @Throws(IllegalStateException::class)
     inline fun <reified T> requireScene(): T {
-        val scene = act.value.scene
+        val scene = stage.value.scene
         if (scene is T) {
             return scene
         }
         val errorMessage =
             "Fatal state error: expected scene of type ${T::class.javaClass.name} but received ${(scene::class as Any).javaClass.name}"
-        Timber.e(errorMessage)
+        Timber.Forest.e(errorMessage)
 
         throw IllegalStateException(errorMessage)
     }
@@ -64,7 +59,7 @@ abstract class StageViewModel<T : Scene, U : Plot, V: Decor>(
                     targetSteps = combinedTargetSet, inclusive = inclusive
                 )
 
-                else -> act.value
+                else -> stage.value
             }
         )
 
@@ -95,19 +90,19 @@ abstract class StageViewModel<T : Scene, U : Plot, V: Decor>(
     }
 
     fun hasPrevious(): Boolean {
-        return act.value.hasPrevious()
+        return stage.value.hasPrevious()
     }
 
     private fun getPreviousActByReplace(
         targetSteps: Set<KClass<out T>>
     ): Stage<T, U, V> {
 
-        val parentState = act.value.currentSequence()
+        val parentState = stage.value.currentSequence()
 
         val state = when {
-            targetSteps.isEmpty() -> act.value
+            targetSteps.isEmpty() -> stage.value
             targetSteps.any { it.isInstance(parentState?.scene) } -> parentState?.pop()
-            else -> act.value
+            else -> stage.value
         }
 
         return state ?: initialStage.copy(isFinal = true)
@@ -118,15 +113,15 @@ abstract class StageViewModel<T : Scene, U : Plot, V: Decor>(
         inclusive: Boolean = false
     ): Stage<T, U, V> {
         val result = if (targetSteps.isEmpty()) {
-            act.value.pop()
+            stage.value.pop()
         } else {
-            var current = act.value.pop()
+            var current = stage.value.pop()
             while (current != null && targetSteps.none { it.isInstance(current.scene) }) {
                 current = current.pop()
             }
 
             when {
-                current == null -> act.value
+                current == null -> stage.value
                 inclusive -> current.pop()
                 else -> current
             }
@@ -136,7 +131,7 @@ abstract class StageViewModel<T : Scene, U : Plot, V: Decor>(
     }
 
     private fun logStateDebugInfo() {
-        Timber.i("${javaClass.simpleName}: ${act.value.getDebugInfo()}")
+        Timber.Forest.i("${javaClass.simpleName}: ${stage.value.getDebugInfo()}")
     }
 
 }

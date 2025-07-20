@@ -5,15 +5,20 @@ import kotlin.reflect.KClass
 
 class PageControllerRegistry {
 
-    private val registry = mutableMapOf<KClass<out Scene>, (Scene) -> PageController<out Scene>>()
+    private class Entry<S : Scene>(
+        val factory: () -> PageController<S>
+    )
 
-    fun register(sceneType: KClass<Scene>, scenefactory: () -> PageController<Scene>) {
-        registry[sceneType] = scenefactory
+    private val registry = mutableMapOf<KClass<out Scene>, Entry<out Scene>>()
+
+    fun <S : Scene> register(sceneType: KClass<S>, sceneFactory: () -> PageController<S>) {
+        registry[sceneType] = Entry(sceneFactory)
     }
 
     @Suppress("UNCHECKED_CAST")
     fun <S : Scene> getController(scene: S): PageController<S>? {
-        return registry[scene::class]?.invoke(scene) as? PageController<S>
+        val entry = registry[scene::class] ?: return null
+        return (entry as Entry<S>).factory()
     }
 
 }

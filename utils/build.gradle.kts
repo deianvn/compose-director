@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.github.deianvn.compose.director.core"
+    namespace = "com.github.deianvn.compose.director.utils"
     compileSdk = 36
 
     defaultConfig {
@@ -45,7 +45,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 from(components["release"])
                 groupId = "com.github.deianvn"
-                artifactId = "compose-director-core"
+                artifactId = "compose-director-utils"
 
                 // Change version for new release
                 version = "1.0.0"
@@ -55,6 +55,8 @@ afterEvaluate {
 }
 
 dependencies {
+    implementation(project(":core"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
