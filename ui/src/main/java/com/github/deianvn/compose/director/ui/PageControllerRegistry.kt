@@ -1,7 +1,7 @@
-package com.github.deianvn.compose.director.core
+package com.github.deianvn.compose.director.ui
 
+import com.github.deianvn.compose.director.core.Scene
 import kotlin.reflect.KClass
-
 
 class PageControllerRegistry {
 
