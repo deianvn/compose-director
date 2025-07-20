@@ -1,12 +1,10 @@
 package com.github.deianvn.compose.director.utils
 
-import com.github.deianvn.compose.director.core.error.AuthenticationError
-import com.github.deianvn.compose.director.core.error.AuthorizationError
-import com.github.deianvn.compose.director.core.error.ClientError
 import com.github.deianvn.compose.director.core.error.GeneralError
-import com.github.deianvn.compose.director.core.error.IOError
-import com.github.deianvn.compose.director.core.error.SerializationError
-import com.github.deianvn.compose.director.core.error.ServerError
+import com.github.deianvn.compose.director.core.error.GeneralError.ClientError
+import com.github.deianvn.compose.director.core.error.GeneralError.IOError
+import com.github.deianvn.compose.director.core.error.GeneralError.ServerError
+import com.github.deianvn.compose.director.core.error.GeneralError.UnknownError
 import com.github.deianvn.compose.director.core.error.StageError
 import org.json.JSONException
 import retrofit2.HttpException
@@ -21,8 +19,8 @@ fun toStageError(
     val stageError = handler(error) ?: when {
         error is StageError -> error
         error is IOException -> IOError(error)
-        error is HttpException && error.code() == 401 -> AuthenticationError(cause = error)
-        error is HttpException && error.code() == 403 -> AuthorizationError(cause = error)
+        error is HttpException && error.code() == 401 -> GeneralError.AuthenticationError(cause = error)
+        error is HttpException && error.code() == 403 -> GeneralError.AuthorizationError(cause = error)
         error is HttpException && error.code() in 400..499 -> ClientError(
             cause = error, code = error.code()
         )
@@ -31,8 +29,8 @@ fun toStageError(
             cause = error, code = error.code()
         )
 
-        error is JSONException -> SerializationError(error)
-        else -> GeneralError(cause = error)
+        error is JSONException -> GeneralError.SerializationError(error)
+        else -> UnknownError(cause = error)
     }
 
     return stageError
