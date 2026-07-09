@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.github.deianvn.compose.director.ui"
+    namespace = "com.github.deianvn.compose.director.state"
     compileSdk = 36
 
     defaultConfig {
@@ -45,7 +45,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 from(components["release"])
                 groupId = "com.github.deianvn"
-                artifactId = "compose-director-ui"
+                artifactId = "compose-director-core"
 
                 // Change version for new release
                 version = "1.0.0"
@@ -55,14 +55,12 @@ afterEvaluate {
 }
 
 dependencies {
-
-    implementation(project(":state"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.runtime.android)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-
+    implementation(libs.material)
     implementation(libs.timber)
+    implementation(libs.retrofit)
+    implementation(libs.androidx.runtime.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

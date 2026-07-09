@@ -20,5 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "compose-director"
-include(":core", ":ui", ":utils")
+include(":state", ":ui")
  
