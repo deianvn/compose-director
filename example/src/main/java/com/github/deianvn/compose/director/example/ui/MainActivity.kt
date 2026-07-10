@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,7 +31,7 @@ import com.github.deianvn.compose.director.example.ui.components.LoadedContent
 
 class MainActivity : ComponentActivity() {
 
-    val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +41,7 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Surface(modifier = Modifier.padding(innerPadding)) {
-                        Dispatcher(viewModel)
+                        Content(viewModel)
                     }
                 }
             }
@@ -50,14 +49,14 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun Dispatcher(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+    fun Content(viewModel: MainViewModel) {
         val state by viewModel.state.collectAsStateWithLifecycle()
 
         StateBackHandler(viewModel)
 
         state.finishOnNull { state ->
             LoadedContent(
-                modifier = modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 isLoading = state.status.isWorking()
             ) {
                 when (val step = state.step) {

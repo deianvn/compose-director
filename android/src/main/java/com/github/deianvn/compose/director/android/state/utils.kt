@@ -3,6 +3,7 @@ package com.github.deianvn.compose.director.android.state
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import com.github.deianvn.compose.director.android.viewmodel.StateViewModel
 import com.github.deianvn.compose.director.state.SideData
 import com.github.deianvn.compose.director.state.StateNode
@@ -16,7 +17,9 @@ fun <T : Step, U : SideData, V : SideData, W : SideData> StateNode<T, U, V, W>?.
     val activity = LocalActivity.current
 
     if (this == null) {
-        activity?.finish()
+        LaunchedEffect(Unit) {
+            activity?.finish()
+        }
     } else {
         composable(this)
     }
