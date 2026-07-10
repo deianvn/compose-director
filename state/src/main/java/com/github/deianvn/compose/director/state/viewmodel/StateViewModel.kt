@@ -1,0 +1,66 @@
+package com.github.deianvn.compose.director.state.viewmodel
+
+import androidx.lifecycle.ViewModel
+import com.github.deianvn.compose.director.state.SideData
+import com.github.deianvn.compose.director.state.StateNode
+import com.github.deianvn.compose.director.state.Step
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import timber.log.Timber
+
+
+abstract class StateViewModel<T : Step, U : SideData, V : SideData, W : SideData>(
+    initialNode: StateNode<T, U, V, W>
+) : ViewModel() {
+
+    private val _node = MutableStateFlow<StateNode<T, U, V, W>?>(initialNode)
+
+    val node get() = _node.asStateFlow()
+
+    private val currentNode: StateNode<T, U, V, W>
+        get() = _node.value ?: throw IllegalStateException(
+            "State has terminated: no active node."
+        )
+
+    init {
+        logStateDebugInfo()
+    }
+
+    @Throws(IllegalStateException::class)
+    inline fun <reified S> requireStep(): S {
+        val step = node.value?.step
+        if (step is S) {
+            return step
+        }
+        val errorMessage =
+            "Fatal state error: expected step of type ${S::class.java.name} but received ${step?.let { (it::class as Any).javaClass.name }}"
+        Timber.e(errorMessage)
+
+        throw IllegalStateException(errorMessage)
+    }
+
+    fun navigate(compute: StateNode<T, U, V, W>.() -> StateNode<T, U, V, W>) {
+        publish(currentNode.compute())
+    }
+
+    fun back(): Boolean {
+        val previous = currentNode.pop()
+        publish(previous)
+        return previous != null
+    }
+
+    fun hasPrevious(): Boolean {
+        return node.value?.hasPrevious() ?: false
+    }
+
+    private fun publish(newNode: StateNode<T, U, V, W>?) {
+        _node.value = newNode
+        newNode?.action?.invoke()
+        logStateDebugInfo()
+    }
+
+    private fun logStateDebugInfo() {
+        Timber.i("${javaClass.simpleName}: ${node.value?.getDebugInfo() ?: "[terminated]"}")
+    }
+
+}

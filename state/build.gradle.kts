@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.retrofit)
     implementation(libs.androidx.runtime.android)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
