@@ -1,9 +1,15 @@
 package com.github.deianvn.compose.director.example.ui
 
+import androidx.lifecycle.viewModelScope
 import com.github.deianvn.compose.director.example.state.MainStep
 import com.github.deianvn.compose.director.state.StateNode
 import com.github.deianvn.compose.director.state.Status
 import com.github.deianvn.compose.director.android.viewmodel.SimpleStateViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 
 class MainViewModel : SimpleStateViewModel<MainStep>(
@@ -21,13 +27,23 @@ class MainViewModel : SimpleStateViewModel<MainStep>(
         }
     }
 
-    fun submitText(input: String) {
+    fun submitText(input: String) = viewModelScope.launch {
+
+        withContext(Dispatchers.IO) {
+            navigate {
+                it.chain(status = Status.WORKING, remembered = false)
+            }
+
+            delay(3000L.milliseconds)
+        }
+
         navigate {
             it.chain(
                 step = MainStep.SecondStep(input),
                 status = Status.IDLE
             )
         }
+
     }
 
     fun openThirdPage() {

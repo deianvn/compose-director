@@ -27,6 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.deianvn.compose.director.android.state.StateBackHandler
 import com.github.deianvn.compose.director.android.state.finishOnNull
 import com.github.deianvn.compose.director.example.state.MainStep
+import com.github.deianvn.compose.director.example.ui.components.LoadedContent
 
 
 class MainActivity : ComponentActivity() {
@@ -55,7 +56,10 @@ class MainActivity : ComponentActivity() {
         StateBackHandler(viewModel)
 
         state.finishOnNull { state ->
-            Box(modifier = modifier.fillMaxSize()) {
+            LoadedContent(
+                modifier = modifier.fillMaxSize(),
+                isLoading = state.status.isWorking()
+            ) {
                 when (val step = state.step) {
                     is MainStep.FirstStep -> FirstPage(onSubmit = viewModel::submitText)
                     is MainStep.SecondStep -> SecondPage(
