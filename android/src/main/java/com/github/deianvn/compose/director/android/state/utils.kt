@@ -11,17 +11,18 @@ import com.github.deianvn.compose.director.state.Step
 
 
 @Composable
-fun <T : Step, U : SideData, V : SideData, W : SideData> StateNode<T, U, V, W>?.finishOnNull(
-    composable: @Composable (StateNode<T, U, V, W>) -> Unit
+fun <T : Step, U : SideData, V : SideData, W : SideData> FinishOnNull(
+    node: StateNode<T, U, V, W>?,
+    content: @Composable (StateNode<T, U, V, W>) -> Unit
 ) {
     val activity = LocalActivity.current
 
-    if (this == null) {
+    if (node == null) {
         LaunchedEffect(Unit) {
             activity?.finish()
         }
     } else {
-        composable(this)
+        content(node)
     }
 }
 
