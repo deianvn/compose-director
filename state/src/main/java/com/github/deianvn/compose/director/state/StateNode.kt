@@ -7,18 +7,18 @@ class StateNode<T : Step, U : SideData, V : SideData, W : SideData> {
     val step: T
     val status: Status
     private var _sharedData: U
-    val sharedData: U get() = _head._sharedData
+    val sharedData: U get() = head._sharedData
     val persistentData: V
     val temporaryData: W
     val remembered: Boolean
     val action: () -> Unit
     private val previousNode: StateNode<T, U, V, W>?
-    private val _head: StateNode<T, U, V, W>
+    val head: StateNode<T, U, V, W>
 
 
     companion object {
 
-        fun <T : Step, U : SideData, V : SideData, W : SideData> init(
+        fun <T : Step, U : SideData, V : SideData, W : SideData> head(
             step: T,
             status: Status,
             sharedData: U,
@@ -58,16 +58,14 @@ class StateNode<T : Step, U : SideData, V : SideData, W : SideData> {
         this.temporaryData = temporaryData
         this.remembered = remembered
         this.action = action
-        this._head = headNode ?: this
+        this.head = headNode ?: this
         this.previousNode = previousNode
     }
 
-    fun owner(): StateNode<T, U, V, W>? = when {
+    val owner: StateNode<T, U, V, W>? get() = when {
         remembered -> this
         else -> previousNode
     }
-
-    fun head() = _head
 
     fun copy(
         step: T = this.step,
@@ -84,7 +82,7 @@ class StateNode<T : Step, U : SideData, V : SideData, W : SideData> {
         persistentData = persistentData,
         temporaryData = temporaryData,
         remembered = remembered,
-        headNode = _head,
+        headNode = head,
         previousNode = previousNode,
         action = action
     )
@@ -94,11 +92,11 @@ class StateNode<T : Step, U : SideData, V : SideData, W : SideData> {
         step: T = this.step,
         sharedData: U = this.sharedData,
         persistentData: V = this.persistentData,
-        temporaryData: W = _head.temporaryData,
+        temporaryData: W = head.temporaryData,
         remembered: Boolean = true,
         action: () -> Unit = {}
     ): StateNode<T, U, V, W> {
-        _head._sharedData = sharedData
+        head._sharedData = sharedData
 
         return StateNode(
             revision = revision + 1L,
@@ -108,7 +106,7 @@ class StateNode<T : Step, U : SideData, V : SideData, W : SideData> {
             persistentData = persistentData,
             temporaryData = temporaryData,
             remembered = remembered,
-            headNode = _head,
+            headNode = head,
             previousNode = if (this.remembered) this else previousNode,
             action = action,
         )
@@ -123,7 +121,7 @@ class StateNode<T : Step, U : SideData, V : SideData, W : SideData> {
     }
 
     fun pop(): StateNode<T, U, V, W>? {
-        return owner()?.previousNode
+        return owner?.previousNode
     }
 
     fun getDebugInfo(): String {
