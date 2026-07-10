@@ -20,6 +20,19 @@ class StateNode<T : Step, U : SideData, V : SideData, W : SideData> {
 
     companion object {
 
+        fun <T : Step> head(
+            step: T,
+            status: Status,
+            action: () -> Unit = {}
+        ): StateNode<T, EmptySideData, EmptySideData, EmptySideData> = head(
+            step = step,
+            status = status,
+            sharedData = EmptySideData,
+            persistentData = EmptySideData,
+            temporaryData = EmptySideData,
+            action = action
+        )
+
         fun <T : Step, U : SideData, V : SideData, W : SideData> head(
             step: T,
             status: Status,

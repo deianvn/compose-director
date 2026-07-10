@@ -61,6 +61,7 @@ sealed class GeneralError(
 
 }
 
+
 fun toStateError(
     error: Throwable,
     handler: (Throwable) -> StateError? = { _ -> null }

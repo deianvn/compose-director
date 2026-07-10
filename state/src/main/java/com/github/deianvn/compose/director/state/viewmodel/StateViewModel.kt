@@ -34,13 +34,13 @@ abstract class StateViewModel<T : Step, U : SideData, V : SideData, W : SideData
         throw IllegalStateException(errorMessage)
     }
 
-    fun navigate(compute: StateNode<T, U, V, W>.() -> StateNode<T, U, V, W>) {
+    fun navigate(compute: (StateNode<T, U, V, W>) -> StateNode<T, U, V, W>) {
         val currentNode = node.value
         if (currentNode == null) {
             Timber.w("${javaClass.simpleName}: navigate called on a terminated state, ignoring")
             return
         }
-        publish(currentNode.compute())
+        publish(compute(currentNode))
     }
 
     fun back(): Boolean {

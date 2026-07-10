@@ -1,30 +1,30 @@
 package com.github.deianvn.compose.director.example
 
 import com.github.deianvn.compose.director.example.state.MainStep
-import com.github.deianvn.compose.director.state.EmptySideData
 import com.github.deianvn.compose.director.state.StateNode
 import com.github.deianvn.compose.director.state.Status
-import com.github.deianvn.compose.director.state.viewmodel.StateViewModel
+import com.github.deianvn.compose.director.state.viewmodel.SimpleStateViewModel
 
 
-class MainViewModel : StateViewModel<MainStep, EmptySideData, EmptySideData, EmptySideData>(
+class MainViewModel : SimpleStateViewModel<MainStep>(
     StateNode.head(
         step = MainStep.Step1(),
-        status = Status.WORKING,
-        EmptySideData(),
-        EmptySideData(),
-        EmptySideData()
+        status = Status.WORKING
     )
 ) {
 
     init {
-
+        navigate {
+            it.chain(
+                status = Status.IDLE
+            )
+        }
     }
 
-    fun click1() {
+    fun click1(input: String) {
         navigate {
-            chain(
-                step = MainStep.Step2(),
+            it.chain(
+                step = MainStep.Step2(input),
                 status = Status.IDLE
             )
         }
@@ -32,7 +32,7 @@ class MainViewModel : StateViewModel<MainStep, EmptySideData, EmptySideData, Emp
 
     fun click2() {
         navigate {
-            chain(
+            it.chain(
                 step = MainStep.Step3(),
                 status = Status.IDLE
             )
@@ -41,7 +41,7 @@ class MainViewModel : StateViewModel<MainStep, EmptySideData, EmptySideData, Emp
 
     fun click3() {
         navigate {
-            seek().chain(
+            it.head.chain(
                 step = MainStep.Step1(),
                 status = Status.IDLE
             )
