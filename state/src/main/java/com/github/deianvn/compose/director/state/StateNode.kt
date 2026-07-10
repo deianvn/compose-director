@@ -1,5 +1,7 @@
 package com.github.deianvn.compose.director.state
 
+import kotlin.reflect.KClass
+
 
 class StateNode<T : Step, U : SideData, V : SideData, W : SideData> {
 
@@ -122,6 +124,41 @@ class StateNode<T : Step, U : SideData, V : SideData, W : SideData> {
 
     fun pop(): StateNode<T, U, V, W>? {
         return owner?.previousNode
+    }
+
+    fun seek(
+        target: KClass<out T>? = null,
+        targetSet: Set<KClass<out T>> = emptySet(),
+        limit: Int? = null,
+        inclusive: Boolean = false,
+        currentIfMissing: Boolean = true
+    ): StateNode<T, U, V, W> {
+        val miss = if (currentIfMissing) this else head
+
+        val targets = buildSet {
+            target?.let { add(it) }
+            addAll(targetSet)
+        }
+
+        if (targets.isEmpty()) {
+            return miss
+        }
+
+        var current: StateNode<T, U, V, W>? = owner
+        var remaining = limit
+
+        while (current != null) {
+            val node = current
+            if (targets.any { it.isInstance(node.step) }) {
+                return if (inclusive) node.pop() ?: head else node
+            }
+            if (remaining != null && --remaining <= 0) {
+                return miss
+            }
+            current = node.pop()
+        }
+
+        return miss
     }
 
     fun getDebugInfo(): String {
