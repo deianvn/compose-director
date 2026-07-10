@@ -42,6 +42,7 @@ android {
 dependencies {
 
     implementation(project(":state"))
+    implementation(project(":android"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

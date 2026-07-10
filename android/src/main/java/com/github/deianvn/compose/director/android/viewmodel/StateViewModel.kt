@@ -1,4 +1,4 @@
-package com.github.deianvn.compose.director.state.viewmodel
+package com.github.deianvn.compose.director.android.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.github.deianvn.compose.director.state.SideData
@@ -15,7 +15,7 @@ abstract class StateViewModel<T : Step, U : SideData, V : SideData, W : SideData
 
     private val _node = MutableStateFlow<StateNode<T, U, V, W>?>(initialNode)
 
-    val node get() = _node.asStateFlow()
+    val state get() = _node.asStateFlow()
 
     init {
         logStateDebugInfo()
@@ -23,7 +23,7 @@ abstract class StateViewModel<T : Step, U : SideData, V : SideData, W : SideData
 
     @Throws(IllegalStateException::class)
     inline fun <reified S> requireStep(): S {
-        val step = node.value?.step
+        val step = state.value?.step
         if (step is S) {
             return step
         }
@@ -35,7 +35,7 @@ abstract class StateViewModel<T : Step, U : SideData, V : SideData, W : SideData
     }
 
     fun navigate(compute: (StateNode<T, U, V, W>) -> StateNode<T, U, V, W>) {
-        val currentNode = node.value
+        val currentNode = state.value
         if (currentNode == null) {
             Timber.w("${javaClass.simpleName}: navigate called on a terminated state, ignoring")
             return
@@ -44,13 +44,13 @@ abstract class StateViewModel<T : Step, U : SideData, V : SideData, W : SideData
     }
 
     fun back(): Boolean {
-        val previous = node.value?.pop()
+        val previous = state.value?.pop()
         publish(previous)
         return previous != null
     }
 
     fun hasPrevious(): Boolean {
-        return node.value?.hasPrevious() == true
+        return state.value?.hasPrevious() == true
     }
 
     private fun publish(newNode: StateNode<T, U, V, W>?) {
@@ -60,7 +60,7 @@ abstract class StateViewModel<T : Step, U : SideData, V : SideData, W : SideData
     }
 
     private fun logStateDebugInfo() {
-        Timber.i("${javaClass.simpleName}: ${node.value?.getDebugInfo() ?: "[terminated]"}")
+        Timber.i("${javaClass.simpleName}: ${state.value?.getDebugInfo() ?: "[terminated]"}")
     }
 
 }

@@ -1,11 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
     id("maven-publish")
 }
 
 android {
-    namespace = "com.github.deianvn.compose.director.state"
+    namespace = "com.github.deianvn.compose.director.android"
     compileSdk = 36
 
     defaultConfig {
@@ -31,10 +32,13 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        compose = true
+    }
     publishing {
         singleVariant("release") {
-            withSourcesJar()  // Optional: publish sources
-            withJavadocJar()  // Optional: publish Javadoc
+            withSourcesJar()
+            withJavadocJar()
         }
     }
 }
@@ -45,7 +49,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 from(components["release"])
                 groupId = "com.github.deianvn"
-                artifactId = "compose-director-core"
+                artifactId = "compose-director-android"
 
                 // Change version for new release
                 version = "1.0.0"
@@ -55,14 +59,22 @@ afterEvaluate {
 }
 
 dependencies {
+
+    api(project(":state"))
+
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.activity.compose)
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.runtime.livedata)
+    implementation(libs.compose.ui)
+
     implementation(libs.timber)
-    implementation(libs.retrofit)
-    implementation(libs.androidx.runtime.android)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.compose.bom))
 }

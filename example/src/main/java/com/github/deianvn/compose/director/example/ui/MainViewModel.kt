@@ -1,14 +1,14 @@
-package com.github.deianvn.compose.director.example
+package com.github.deianvn.compose.director.example.ui
 
 import com.github.deianvn.compose.director.example.state.MainStep
 import com.github.deianvn.compose.director.state.StateNode
 import com.github.deianvn.compose.director.state.Status
-import com.github.deianvn.compose.director.state.viewmodel.SimpleStateViewModel
+import com.github.deianvn.compose.director.android.viewmodel.SimpleStateViewModel
 
 
 class MainViewModel : SimpleStateViewModel<MainStep>(
     StateNode.head(
-        step = MainStep.Step1(),
+        step = MainStep.FirstStep(),
         status = Status.WORKING
     )
 ) {
@@ -21,28 +21,28 @@ class MainViewModel : SimpleStateViewModel<MainStep>(
         }
     }
 
-    fun click1(input: String) {
+    fun submitText(input: String) {
         navigate {
             it.chain(
-                step = MainStep.Step2(input),
+                step = MainStep.SecondStep(input),
                 status = Status.IDLE
             )
         }
     }
 
-    fun click2() {
+    fun openThirdPage() {
         navigate {
             it.chain(
-                step = MainStep.Step3(),
+                step = MainStep.ThirdStep(),
                 status = Status.IDLE
             )
         }
     }
 
-    fun click3() {
+    fun reset() {
         navigate {
             it.head.chain(
-                step = MainStep.Step1(),
+                step = MainStep.FirstStep(),
                 status = Status.IDLE
             )
         }

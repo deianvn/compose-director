@@ -1,4 +1,4 @@
-package com.github.deianvn.compose.director.state.viewmodel
+package com.github.deianvn.compose.director.android.viewmodel
 
 import com.github.deianvn.compose.director.state.EmptySideData
 import com.github.deianvn.compose.director.state.StateNode
