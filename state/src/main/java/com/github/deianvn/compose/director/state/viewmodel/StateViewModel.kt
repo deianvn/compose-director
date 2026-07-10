@@ -17,11 +17,6 @@ abstract class StateViewModel<T : Step, U : SideData, V : SideData, W : SideData
 
     val node get() = _node.asStateFlow()
 
-    private val currentNode: StateNode<T, U, V, W>
-        get() = _node.value ?: throw IllegalStateException(
-            "State has terminated: no active node."
-        )
-
     init {
         logStateDebugInfo()
     }
@@ -40,17 +35,22 @@ abstract class StateViewModel<T : Step, U : SideData, V : SideData, W : SideData
     }
 
     fun navigate(compute: StateNode<T, U, V, W>.() -> StateNode<T, U, V, W>) {
+        val currentNode = node.value
+        if (currentNode == null) {
+            Timber.w("${javaClass.simpleName}: navigate called on a terminated state, ignoring")
+            return
+        }
         publish(currentNode.compute())
     }
 
     fun back(): Boolean {
-        val previous = currentNode.pop()
+        val previous = node.value?.pop()
         publish(previous)
         return previous != null
     }
 
     fun hasPrevious(): Boolean {
-        return node.value?.hasPrevious() ?: false
+        return node.value?.hasPrevious() == true
     }
 
     private fun publish(newNode: StateNode<T, U, V, W>?) {
