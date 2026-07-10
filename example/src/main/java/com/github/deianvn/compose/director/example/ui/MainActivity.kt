@@ -24,7 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.deianvn.compose.director.android.state.StateBackHandler
-import com.github.deianvn.compose.director.android.state.FinishOnNull
+import com.github.deianvn.compose.director.android.ui.components.FinishOnNull
 import com.github.deianvn.compose.director.example.state.MainStep
 import com.github.deianvn.compose.director.example.ui.components.LoadedContent
 

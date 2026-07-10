@@ -1,10 +1,8 @@
-package com.github.deianvn.compose.director.android.state
+package com.github.deianvn.compose.director.android.ui.components
 
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.github.deianvn.compose.director.android.viewmodel.StateViewModel
 import com.github.deianvn.compose.director.state.SideData
 import com.github.deianvn.compose.director.state.StateNode
 import com.github.deianvn.compose.director.state.Step
@@ -25,9 +23,3 @@ fun <T : Step, U : SideData, V : SideData, W : SideData> FinishOnNull(
         content(node)
     }
 }
-
-@Composable
-fun StateBackHandler(viewModel: StateViewModel<*, *, *, *>, enabled: Boolean = true) {
-    BackHandler(enabled = enabled) { viewModel.back() }
-}
-
