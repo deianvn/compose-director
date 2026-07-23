@@ -14,4 +14,19 @@ sealed class Status {
     fun isIdle() = this is IDLE
 
     fun isError() = this is ERROR
+
+    inline fun onWorking(block: () -> Unit): Status {
+        if (this is WORKING) block()
+        return this
+    }
+
+    inline fun onIdle(block: () -> Unit): Status {
+        if (this is IDLE) block()
+        return this
+    }
+
+    inline fun onError(block: (StateError) -> Unit): Status {
+        if (this is ERROR) block(error)
+        return this
+    }
 }
