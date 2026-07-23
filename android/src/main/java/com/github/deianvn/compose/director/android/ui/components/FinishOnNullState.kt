@@ -3,13 +3,11 @@ package com.github.deianvn.compose.director.android.ui.components
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.github.deianvn.compose.director.state.SideData
 import com.github.deianvn.compose.director.state.StateNode
-import com.github.deianvn.compose.director.state.Step
 
 
 @Composable
-fun <T : Step, U : SideData, V : SideData, W : SideData> FinishOnNull(
+fun <T : Any, U : Any, V : Any, W : Any> FinishOnNullState(
     node: StateNode<T, U, V, W>?,
     content: @Composable (StateNode<T, U, V, W>) -> Unit
 ) {

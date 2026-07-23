@@ -46,12 +46,20 @@ class MainViewModel : SimpleStateViewModel<MainStep>(
 
     }
 
-    fun openThirdPage() {
+    fun openThirdPage() = viewModelScope.launch {
         navigate {
-            it.chain(
-                step = MainStep.ThirdStep(),
-                status = Status.IDLE
-            )
+            it.chain(status = Status.WORKING, remembered = false)
+        }
+
+        withContext(Dispatchers.IO) {
+            delay(5000.milliseconds)
+
+            navigate {
+                it.chain(
+                    step = MainStep.ThirdStep(),
+                    status = Status.IDLE
+                )
+            }
         }
     }
 

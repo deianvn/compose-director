@@ -23,8 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.github.deianvn.compose.director.android.state.StateBackHandler
-import com.github.deianvn.compose.director.android.ui.components.FinishOnNull
+import com.github.deianvn.compose.director.android.ui.components.FinishOnNullState
+import com.github.deianvn.compose.director.android.ui.components.StateBackHandler
 import com.github.deianvn.compose.director.example.state.MainStep
 import com.github.deianvn.compose.director.example.ui.components.LoadedContent
 
@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
 
         StateBackHandler(viewModel)
 
-        FinishOnNull(state) { state ->
+        FinishOnNullState(state) { state ->
             LoadedContent(
                 modifier = Modifier.fillMaxSize(),
                 isLoading = state.status.isWorking()

@@ -1,15 +1,13 @@
 package com.github.deianvn.compose.director.android.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.github.deianvn.compose.director.state.SideData
 import com.github.deianvn.compose.director.state.StateNode
-import com.github.deianvn.compose.director.state.Step
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import timber.log.Timber
 
 
-abstract class StateViewModel<T : Step, U : SideData, V : SideData, W : SideData>(
+abstract class StateViewModel<T : Any, U : Any, V : Any, W : Any>(
     initialNode: StateNode<T, U, V, W>
 ) : ViewModel() {
 
